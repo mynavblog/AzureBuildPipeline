@@ -1,0 +1,39 @@
+{
+    "ContainerName": "bcbuild",
+    "ContainerImage": "mcr.microsoft.com/businesscentral/onprem",
+    "ContainerLicFile": "C:\\temp\\lic.flf",
+    "ContainerAddtionalFiles": [
+        {
+            "FileName": "Microsoft.Dynamics.Nav.DocumentService.dll",
+            "FilePathInLocal": "c:\\temp\\Microsoft.Dynamics.Nav.DocumentService.dll",
+            "FilePathInContainer": "C:\\Program Files\\Microsoft Dynamics NAV\\140\\Service\\Add-ins\\Microsoft.Dynamics.Nav.DocumentService.dll"
+        },        
+        {
+            "FileName": "Microsoft.Dynamics.Nav.DocumentService.Types.dll",
+            "FilePathInLocal": "c:\\temp\\Microsoft.Dynamics.Nav.DocumentService.Types.dll",
+            "FilePathInContainer": "C:\\Program Files\\Microsoft Dynamics NAV\\140\\Service\\Add-ins\\Microsoft.Dynamics.Nav.DocumentService.Types.dll"
+        }
+    ],
+    "ApplicationsToProcess": [
+        {
+            "ApplicationId": "App1",
+            "ApplicationName": "App1",
+            "AppRepository": "https://dev.azure.com/xxxx/xxx/_git/App1",
+            "AppRepositoryBranch": "develop" 
+        },
+        {
+            "ApplicationId": "App2",
+            "ApplicationName": "App2",
+            "AppRepository": "https://dev.azure.com/xxxx/xxx/_git/App2",
+            "AppRepositoryBranch": "master"  
+        }
+    ],
+    "TestAppsToProcess": [
+        {
+            "ApplicationId": "TestApp1",
+            "ApplicationName": "TestApp1",
+            "AppRepository": "https://dev.azure.com/xxxx/xxx/_git/TestApp1",
+            "AppRepositoryBranch": "master" 
+        }
+    ]
+}

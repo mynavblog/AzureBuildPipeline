@@ -1,0 +1,52 @@
+variables:
+  build.clean: all
+  platform: x64
+
+trigger: none
+
+steps:
+- task: PowerShell@2
+  displayName: 'Install NAV Container Helper'
+  inputs:
+    targetType: filePath
+    filePath: 'BuildScripts\InstallNAVContainerHelpers.ps1'
+
+- task: PowerShell@2
+  displayName: 'Create Build Docker Container'
+  inputs:
+    targetType: filePath
+    filePath: 'BuildScripts\CreateDockerContainer.ps1'
+    arguments: '-credential ([PSCredential]::new("$(DockerContainerUsername)", (ConvertTo-SecureString -String "$(DockerContainerPassword)" -AsPlainText -Force)))'
+
+- task: PowerShell@2
+  displayName: 'Copy Files to Docker Container'
+  inputs:
+    targetType: filePath
+    filePath: 'BuildScripts\CopyFilesToDockerContainer.ps1'
+    
+- task: PowerShell@2
+  displayName: 'Compile Single App stored in Repo'
+  inputs:
+    targetType: filePath
+    filePath: 'BuildScripts\CompileSingleApp.ps1'
+    arguments: '-Credential ([PSCredential]::new("$(DockerContainerUsername)", (ConvertTo-SecureString -String "$(DockerContainerPassword)" -AsPlainText -Force))) -BuildFolder "$(Build.Repository.LocalPath)" -BuildArtifactFolder "$(Build.ArtifactStagingDirectory)"'
+    failOnStderr: true
+    
+- task: PowerShell@2
+  displayName: 'Publish Single App'
+  inputs:
+    targetType: filePath
+    filePath: 'BuildScripts\PublishSingleApp.ps1'
+    arguments: '-Credential ([PSCredential]::new("$(DockerContainerUsername)", (ConvertTo-SecureString -String "$(DockerContainerPassword)" -AsPlainText -Force))) -BuildArtifactFolder "$(Build.ArtifactStagingDirectory)"'
+    failOnStderr: true
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifacts'
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: app
+     
+
+
+
+

@@ -1,0 +1,23 @@
+{
+    "ContainerName": "bcbuild",
+    "ContainerLicFile": "C:\\temp\\lic.flf",
+    "ArtifactSettings": {
+        "Type": "Sandbox",
+        "Select": "Latest",
+        "Version": "",
+        "Country": "us",
+        "Token": ""
+    },
+    "ApplicationsToProcess": [
+        {
+            "ApplicationId": "APP001",
+            "AppFolder": "APP001"
+        }
+    ],
+    "TestAppsToProcess": [
+        {
+            "ApplicationId": "TESTAPP001",
+            "AppFolder": "TESTAPP001"
+        }
+    ]
+}

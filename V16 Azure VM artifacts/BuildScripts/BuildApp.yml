@@ -1,0 +1,63 @@
+parameters:
+  DockerContainerUsername: ''
+  DockerContainerPassword: ''
+  TestResultFile: ''
+  TestSuite: ''
+  ArtifactName: ''
+  ScriptsPath: ''
+
+steps:
+- task: PowerShell@2
+  displayName: 'Install NAV Container Helper'
+  inputs:
+    targetType: filePath
+    filePath: '${{ parameters.ScriptsPath }}InstallNAVContainerHelper.ps1'
+
+- task: PowerShell@2
+  displayName: 'Create Docker Container'
+  condition: always() 
+  inputs:
+    targetType: filePath
+    filePath: '${{ parameters.ScriptsPath }}CreateDockerContainer.ps1'
+    arguments: '-credential ([PSCredential]::new("${{ parameters.DockerContainerUsername }}", (ConvertTo-SecureString -String "${{ parameters.DockerContainerPassword }}" -AsPlainText -Force)))'
+
+- task: PowerShell@2
+  displayName: 'Import and Publish APP001'
+  inputs:
+    targetType: filePath
+    filePath: '${{ parameters.ScriptsPath }}ProcessMultipleApps.ps1'
+    arguments: '-AppToProcess "APP001" -BuildFolder "$(Build.Repository.LocalPath)" -BuildArtifactFolder "$(Build.ArtifactStagingDirectory)" -credential ([PSCredential]::new("${{ parameters.DockerContainerUsername }}", (ConvertTo-SecureString -String "${{ parameters.DockerContainerPassword }}" -AsPlainText -Force)))'
+
+- task: PowerShell@2
+  displayName: 'Import and Publish Test TESTAPP001'
+  inputs:
+    targetType: filePath
+    filePath: '${{ parameters.ScriptsPath }}ProcessTestApps.ps1'
+    arguments: '-AppToProcess "TESTAPP001" -BuildFolder "$(Build.Repository.LocalPath)" -BuildArtifactFolder "$(Build.ArtifactStagingDirectory)" -credential ([PSCredential]::new("${{ parameters.DockerContainerUsername }}", (ConvertTo-SecureString -String "${{ parameters.DockerContainerPassword }}" -AsPlainText -Force)))'
+
+- task: PowerShell@2
+  displayName: 'Execute Automated Tests'
+  inputs:
+    targetType: filePath
+    filePath: '${{ parameters.ScriptsPath }}RunAutomatedTests.ps1'
+    arguments: '-TestResultFile (Join-Path "$(System.DefaultWorkingDirectory)" "${{ parameters.TestResultFile }}") -TestSuite "${{ parameters.TestSuite }}" -credential ([PSCredential]::new("${{ parameters.DockerContainerUsername }}", (ConvertTo-SecureString -String "${{ parameters.DockerContainerPassword }}" -AsPlainText -Force)))'  
+
+- task: PublishTestResults@2
+  displayName: 'Publish Test Results'
+  inputs:
+    testResultsFormat: XUnit
+    testResultsFiles: ${{ parameters.TestResultFile }}
+    failTaskOnFailedTests: false
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifacts'
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: ${{ parameters.ArtifactName }}
+
+- task: PowerShell@2
+  displayName: 'Remove Docker Container'
+  condition: always()
+  inputs:
+    targetType: filePath
+    filePath: '${{ parameters.ScriptsPath }}RemoveDockerContainer.ps1'

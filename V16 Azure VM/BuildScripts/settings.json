@@ -1,0 +1,22 @@
+{
+    "ContainerName": "bcbuild",
+    "ContainerImage": "mcr.microsoft.com/businesscentral/sandbox:us",
+    "ContainerLicFile": "C:\\temp\\lic.flf",
+    "ContainerAddtionalFiles": [],
+    "ApplicationsToProcess": [
+        {
+            "ApplicationId": "App1",
+            "ApplicationName": "App1",
+            "AppRepository": "https://dev.azure.com/xxxx/xxx/_git/App1",
+            "AppRepositoryBranch": "master"
+        }
+    ],
+    "TestAppsToProcess": [
+        {
+            "ApplicationId": "TestApp1",
+            "ApplicationName": "TestApp1",
+            "AppRepository": "https://dev.azure.com/xxxx/xxx/_git/TestApp1",
+            "AppRepositoryBranch": "master"
+        }
+    ]
+}

@@ -1,0 +1,58 @@
+trigger: none
+
+variables:
+  AzureResourceGroup: '<!!! Put here Azure Resource Group where your VM is created !!!>'
+  AzureSubsciption: '<!!! Put here Subsciption from Azure !!!> (<!!! Put here Subsctiption ID from Azure !!!>)' 
+  DockerContainerUsername: 'admin'
+  DockerContainerPassword: 'P@ssword'
+  TestResultFile: 'TestResult.xml'
+  TestSuite: 'DEFAULT'
+  ArtifactName: 'App'
+
+stages:
+- stage: StartBuildVM
+  condition: always()
+  pool:
+    name: 'Azure Pipelines'
+    vmImage: 'vs2017-win2016'
+
+  jobs:
+  - job: StartVM
+    steps:
+    - task: AzureResourceGroupDeployment@2
+      displayName: 'Start build Azure VM'
+      inputs:
+        azureSubscription: $(AzureSubsciption)
+        action: Start
+        resourceGroupName: $(AzureResourceGroup)
+
+
+- stage: BuildApp
+  pool:
+    name: POOL001 //<!!! Put here the Pool name from existing pools !!!>
+  jobs:
+  - job: BuildApp
+    steps:
+    - template: 'BuildApp.yml'
+      parameters:
+        DockerContainerUsername: $(DockerContainerUsername)
+        DockerContainerPassword: $(DockerContainerPassword)
+        TestResultFile: $(TestResultFile)
+        TestSuite: $(TestSuite)
+        ArtifactName: $(ArtifactName)
+
+- stage: StopBuildVM
+  condition: always() 
+  pool:
+    name: 'Azure Pipelines'
+    vmImage: 'vs2017-win2016'
+
+  jobs:
+  - job: StopVM
+    steps:
+    - task: AzureResourceGroupDeployment@2
+      displayName: 'Stop build Azure VM'
+      inputs:
+        azureSubscription: $(AzureSubsciption)
+        action: Stop
+        resourceGroupName: $(AzureResourceGroup)
